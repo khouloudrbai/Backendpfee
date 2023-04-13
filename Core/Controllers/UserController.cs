@@ -225,7 +225,7 @@ namespace Core.Controllers
         }
 
         [HttpPost("list")]
-        public IActionResult Get_user(UserGetDTO Userget)
+        public IActionResult Get_user(UserToGetDTO Userget)
         {
 
             {
@@ -233,7 +233,7 @@ namespace Core.Controllers
                 {
 
                     npgsqlConnection.Open();
-                    string requeteSQL = @"select * from get_user( )";
+                    string requeteSQL = @"select * from get_user('" + Userget.id_user + "')";
 
                     NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 

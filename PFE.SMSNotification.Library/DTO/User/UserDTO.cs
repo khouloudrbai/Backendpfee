@@ -121,6 +121,12 @@ namespace PFE.SMSNotification.Library.DTO.User
         public int id_user { get; set; }
 
     }
+
+    public class UserToGetDTO
+    {
+        public string id_user { get; set; }
+
+    }
     public class UserReturnOneDTO
     {
         public int id_user { get; set; }
