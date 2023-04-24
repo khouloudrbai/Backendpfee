@@ -128,6 +128,8 @@ namespace Core.Controllers
                             UserToUpdateReturnDTO.email = Convert.ToString(UserReader["email"]);
                             UserToUpdateReturnDTO.address = Convert.ToString(UserReader["address"]);
                             UserToUpdateReturnDTO.pwd = Convert.ToString(UserReader["pwd"]);
+                            UserToUpdateReturnDTO.picture = Convert.ToString(UserReader["picture"]);
+
                             results.Add(UserToUpdateReturnDTO);
 
 
