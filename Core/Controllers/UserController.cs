@@ -31,15 +31,15 @@ namespace Core.Controllers
             try
             {
                 npgsqlConnection.Open();
-                string requeteSQL = @"select * from ctl_user_add(" + "'" + Useradd.lastname+ "'," + "'"+Useradd.firstname+ "'," + "'"+ Useradd.mobile + "'," + "'" + Useradd.email + "'," + "'" +
-                    Useradd.address + "','" + Useradd.pwd+ "'," + "'" + Useradd.statuts+ "'," + "'" + Useradd.entry_date+ "'," + "'" +Useradd.picture+"')";
+                string requeteSQL = @"select * from ctl_user_add(" + "'" + Useradd.lastname + "'," + "'" + Useradd.firstname + "'," + "'" + Useradd.mobile + "'," + "'" + Useradd.email + "'," + "'" +
+                    Useradd.address + "','" + Useradd.pwd + "'," + "'" + Useradd.statuts + "'," + "'" + Useradd.entry_date + "'," + "'" + Useradd.picture + "')";
 
                 NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 
                 //read requete
                 NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
                 //n7otouha fi list 
-                UserListToReturnDTO UserToReturnDTO =new UserListToReturnDTO();
+                UserListToReturnDTO UserToReturnDTO = new UserListToReturnDTO();
                 //si user doesnt have a row then
                 if (!UserReader.HasRows)
                 {
@@ -63,7 +63,7 @@ namespace Core.Controllers
                         UserToReturnDTO.picture = Convert.ToString(UserReader["picture"]);
                         UserToReturnDTO.statuts = Convert.ToInt32(UserReader["statuts"]);
                         UserToReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
-                      
+
 
                     }
                     catch (Exception ex)
@@ -93,11 +93,11 @@ namespace Core.Controllers
             {
                 try
                 {
-                    
+
                     npgsqlConnection.Open();
-                    string requeteSQL = @"select * from ctl_user_update(" + "'" +Userupdate.id_user+ "','"+ Userupdate.mobile + "','"
-                                                                              + Userupdate.email +"','"+Userupdate.address + "','"+Userupdate.pwd
-                                                                              +  "')";
+                    string requeteSQL = @"select * from ctl_user_update(" + "'" + Userupdate.id_user + "','" + Userupdate.mobile + "','"
+                                                                              + Userupdate.email + "','" + Userupdate.address + "','" + Userupdate.pwd
+                                                                              + "')";
 
                     NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 
@@ -307,7 +307,7 @@ namespace Core.Controllers
                 {
 
                     npgsqlConnection.Open();
-                    string requeteSQL = @"select * from delate_case_user("  + Userdelete.id_user+ ")";
+                    string requeteSQL = @"select * from delate_case_user(" + Userdelete.id_user + ")";
 
                     NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 
@@ -375,7 +375,7 @@ namespace Core.Controllers
                 {
 
                     npgsqlConnection.Open();
-                    string requeteSQL = @"select * from get_one_user(" + Useroneget.id_user+ ")";
+                    string requeteSQL = @"select * from get_one_user(" + Useroneget.id_user + ")";
 
                     NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 
@@ -437,6 +437,75 @@ namespace Core.Controllers
             }
 
         }
+
+        [HttpPost("getimg")]
+
+
+        public IActionResult Get_img(UserGetimgDTO Userimgget)
+        {
+
+            {
+                try
+                {
+
+                    npgsqlConnection.Open();
+                    string requeteSQL = @"select * from get_img('" + Userimgget.id_user + "')";
+
+                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+
+                    //read requete
+                    NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+                    //n7otouha fi list 
+                    List<UserReturnimgDTO> results = new List<UserReturnimgDTO>();
+
+                    //si user doesnt have a row then
+
+                    if (!UserReader.HasRows)
+                    {
+
+                        npgsqlCommand.Dispose();
+                        npgsqlConnection.Close();
+                        return Ok(new DataResponse<UserReturnOneDTO>(false, "User EMPTY", "500", results));
+                    }
+                    //else 
+                    while (UserReader.Read())
+                    {
+                        try
+                        {
+                            UserReturnimgDTO UserTogetReturnDTO = new UserReturnimgDTO();
+
+
+                            UserTogetReturnDTO.picture = Convert.ToString(UserReader["picture"]);
+
+                            results.Add(UserTogetReturnDTO);
+
+
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            npgsqlConnection.Close();
+                            traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                            return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                        }
+                    }
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+
+                    return Ok(new DataResponse<UserReturnOneDTO>(false, "", "201", results));
+
+                }
+                catch (Exception ex)
+                {
+                    npgsqlConnection.Close();
+                    traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                    return BadRequest(new DataResponse<UserReturnOneDTO>(true, "server error", "500", null));
+                }
+            }
+
+        }
+
 
 
     }
