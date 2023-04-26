@@ -465,7 +465,7 @@ namespace Core.Controllers
 
                         npgsqlCommand.Dispose();
                         npgsqlConnection.Close();
-                        return Ok(new DataResponse<UserReturnOneDTO>(false, "User EMPTY", "500", results));
+                        return Ok(new DataResponse<UserReturnimgDTO>(false, "User EMPTY", "500", results));
                     }
                     //else 
                     while (UserReader.Read())
@@ -493,14 +493,14 @@ namespace Core.Controllers
                     npgsqlCommand.Dispose();
                     npgsqlConnection.Close();
 
-                    return Ok(new DataResponse<UserReturnOneDTO>(false, "", "201", results));
+                    return Ok(new DataResponse<UserReturnimgDTO>(false, "", "201", results));
 
                 }
                 catch (Exception ex)
                 {
                     npgsqlConnection.Close();
                     traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                    return BadRequest(new DataResponse<UserReturnOneDTO>(true, "server error", "500", null));
+                    return BadRequest(new DataResponse<UserReturnimgDTO>(true, "server error", "500", null));
                 }
             }
 

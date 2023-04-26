@@ -151,6 +151,7 @@ namespace Core.Controllers
                 return BadRequest(new DataResponse<ServiceToReturnDTO>(true, "server error", "500", null));
             }
         }
+      
     }
 }
 
