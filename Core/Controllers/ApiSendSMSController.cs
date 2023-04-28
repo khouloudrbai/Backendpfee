@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.IO;
+using System.Reflection;
+using static System.Net.WebRequestMethods;
+using System.Net.Http;
 
 namespace Core.Controllers
 {
@@ -26,77 +29,47 @@ namespace Core.Controllers
             npgsqlConnection = new NpgsqlConnection(Config.CONNECTION_STRING);
         }
         [HttpPost("send-sms")]
-        public IActionResult get_player(SMSToSendDTO sendnotif)
+        public IActionResult getsms(SMSToSendDTO sendnotif)
         {
             try
             {
-
                 string myMobile = sendnotif.mobile;
-                string mySms =sendnotif.sms;
+                string mySms = sendnotif.sms;
                 string mySender = sendnotif.sender;
-                string myDate = sendnotif.date;
-                string myTime = sendnotif.time;
-                string key = "135rnGf7Olilvgamp8VWWYoyYku7eu0OI7G6QxFqi=cehDSXMz4vYut8eoHJjJj2T0AuzRliRON9dri0rowQiqaOgtjQETUiVgeU9Q55";
+                string myKey = "135rnGf7Olilvgamp8VWWYoyYku7eu0OI7G6QxFqi=cehDSXMz4vYut8eoHJjJj2T0AuzRliRON9dri0rowQiqaOgtjQETUiVgeU9Q55";
 
                 var url = "https://mystudents.tunisiesms.tn/api/sms";
 
                 var httpRequest = (HttpWebRequest)WebRequest.Create(url);
                 httpRequest.Method = "POST";
-
-                httpRequest.Accept = "application/json";
-                httpRequest.Headers["Authorization"] = "Bearer {token}";
+                httpRequest.Headers["Authorization"] = "Bearer " + myKey;
                 httpRequest.ContentType = "application/json";
 
-                //{'type': '55', 'sender': %sender%,  'sms':[{'mobile':'%mobile%','sms':'%sms%'}]}
-
-                var data = @"{""employee"":{ ""name"":""Emma"", ""age"":28, ""city"":""Boston"" }} ";
+                string jsonString = "{\"type\":\"55\",\"sender\":\"%sender%\",\"sms\":[{\"mobile\":\"%mobile%\",\"sms\":\"%sms%\"}]}";
+                jsonString = jsonString.Replace("%sender%", mySender);
+                jsonString = jsonString.Replace("%mobile%", myMobile);
+                jsonString = jsonString.Replace("%sms%", mySms);
 
                 using (var streamWriter = new StreamWriter(httpRequest.GetRequestStream()))
                 {
-                    streamWriter.Write(data);
+                    streamWriter.Write(jsonString);
                 }
 
                 var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    var result = streamReader.ReadToEnd();
-                }
 
                 Console.WriteLine(httpResponse.StatusCode);
 
-
-
-
-                //si user doesnt have a row then
-                //if (response.ContentLength == 0)
-                //{
-
-                  
-                //    return Ok(new DataResponse<object>(false, "SMS NOT SENT", "201", response));
-                //}
-
-                ////else 
-                //while (response.ContentLength > 0)
-                //{
-                   
-                //        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
-                    
-                //}
-               
-
-                //return Ok(new DataResponse<object>(false, "", "201", response));
-
+                return Ok(new { success = true, message = "SMS sent", statusCode = (int)httpResponse.StatusCode });
             }
             catch (Exception ex)
             {
-                npgsqlConnection.Close();
-                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                // handle exceptions
+                return BadRequest(new { success = false, message = "Server error", statusCode = 500 });
             }
         }
 
-       
- 
+
+
 
     }
 }

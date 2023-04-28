@@ -438,75 +438,9 @@ namespace Core.Controllers
 
         }
 
-        [HttpPost("getimg")]
 
 
-        public IActionResult Get_img(UserGetimgDTO Userimgget)
-        {
-
-            {
-                try
-                {
-
-                    npgsqlConnection.Open();
-                    string requeteSQL = @"select * from get_img('" + Userimgget.id_user + "')";
-
-                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
-
-                    //read requete
-                    NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
-                    //n7otouha fi list 
-                    List<UserReturnimgDTO> results = new List<UserReturnimgDTO>();
-
-                    //si user doesnt have a row then
-
-                    if (!UserReader.HasRows)
-                    {
-
-                        npgsqlCommand.Dispose();
-                        npgsqlConnection.Close();
-                        return Ok(new DataResponse<UserReturnimgDTO>(false, "User EMPTY", "500", results));
-                    }
-                    //else 
-                    while (UserReader.Read())
-                    {
-                        try
-                        {
-                            UserReturnimgDTO UserTogetReturnDTO = new UserReturnimgDTO();
-
-
-                            UserTogetReturnDTO.picture = Convert.ToString(UserReader["picture"]);
-
-                            results.Add(UserTogetReturnDTO);
-
-
-
-
-                        }
-                        catch (Exception ex)
-                        {
-                            npgsqlConnection.Close();
-                            traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                            return BadRequest(new DataResponse<object>(true, "server error", "500", null));
-                        }
-                    }
-                    npgsqlCommand.Dispose();
-                    npgsqlConnection.Close();
-
-                    return Ok(new DataResponse<UserReturnimgDTO>(false, "", "201", results));
-
-                }
-                catch (Exception ex)
-                {
-                    npgsqlConnection.Close();
-                    traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                    return BadRequest(new DataResponse<UserReturnimgDTO>(true, "server error", "500", null));
-                }
-            }
-
-        }
-
-
+      
 
     }
 }

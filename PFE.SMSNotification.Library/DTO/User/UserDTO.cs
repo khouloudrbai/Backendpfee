@@ -85,7 +85,7 @@ namespace PFE.SMSNotification.Library.DTO.User
 
 
     }
- 
+
     public class UserGetListDTO
     {
         public int id_user { get; set; }
@@ -138,14 +138,6 @@ namespace PFE.SMSNotification.Library.DTO.User
         public string address { get; set; }
 
     }
-    public class UserGetimgDTO
-    {
-        public string id_user { get; set; }
 
-    }
-    public class UserReturnimgDTO
-    {
-        public string picture { get; set; }
-
-    }
+    
 }
