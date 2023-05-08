@@ -6,8 +6,7 @@ using Newtonsoft.Json.Linq;
 using Npgsql;
 using System;
 using System.Collections.Generic;
-
-
+using System.Text.Json;
 
 namespace Core.Controllers
 {
@@ -95,8 +94,8 @@ namespace Core.Controllers
                 {
 
                     npgsqlConnection.Open();
-                    string requeteSQL = @"select * from ctl_user_update(" + "'" + Userupdate.id_user + "','" + Userupdate.mobile + "','"
-                                                                              + Userupdate.email + "','" + Userupdate.address + "','" + Userupdate.pwd
+                    string requeteSQL = @"select * from ctl_user_update(" + "'" + Userupdate.id_user + "','" + Userupdate.mobile + "','" + Userupdate.firstname + "','"
+                                                                              + Userupdate.email + "','" + Userupdate.address + "','"+Userupdate.picture
                                                                               + "')";
 
                     NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
@@ -166,7 +165,7 @@ namespace Core.Controllers
                 {
 
                     npgsqlConnection.Open();
-                    string requeteSQL = @"select * from auth_user(" + "'" + Userauth.email + "','"
+                    string requeteSQL = @"select * from ctl_user_authenticate(" + "'" + Userauth.email + "','"
                                                                               + Userauth.pwd
                                                                               + "')";
 
@@ -438,9 +437,39 @@ namespace Core.Controllers
 
         }
 
+        [HttpPost("updatepwd")]
+        public IActionResult Contact_update_pwd(UserToUpdatePwdDTO Userupdatepwd)
+        {
+            try
+            {
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from ctl_user_password_update(" + "'" + Userupdatepwd.id_user + "','" + Userupdatepwd.old_pwd + "','" + Userupdatepwd.new_pwd + "')";
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 
+                var result = npgsqlCommand.ExecuteScalar();
+                var data = (object)result;
+                JObject json = JObject.Parse((string)result);
+                int code = (int)json["code"];
+                Console.WriteLine("Code: " + code);
 
-      
+                npgsqlCommand.Dispose();
+                npgsqlConnection.Close();
+                if (code == 400)
+                {
+                    return Ok(new DataResponse<object>(true, "", "500", data));
+                }
+                else
+                {
+                    return Ok(new DataResponse<object>(false, "", "201", data));
 
+                }
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+            }
+        }
     }
-}
+    }

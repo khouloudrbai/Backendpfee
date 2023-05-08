@@ -34,7 +34,7 @@ namespace Core.Controllers
                 npgsqlConnection.Open();
                 string requeteSQL = @"select * from ctl_players_detail('" + playerget.id_player + "','" + playerget.keyword + "','"
                     + playerget.id_service + "','" +
-                    playerget.libelle+"','"
+                    playerget.libelle + "','"
                     + playerget.entry_date + "','" +
                     playerget.date_end + "')";
 
@@ -227,6 +227,117 @@ namespace Core.Controllers
                     npgsqlConnection.Close();
                     traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
                     return BadRequest(new DataResponse<JoueurGetListDTO>(true, "server error", "500", null));
+                }
+            }
+
+        }
+
+        [HttpPost("numberjoueur")]
+        public IActionResult Get_number_joueur()
+        {
+
+            {
+                try
+                {
+                    npgsqlConnection.Open();
+                    string requeteSQL = "SELECT clt_number_players()";
+                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                    int number_of_players = (int)npgsqlCommand.ExecuteScalar();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<int>(false, "", "201", number_of_players));
+                }
+                catch (Exception ex)
+                {
+                    npgsqlConnection.Close();
+                    // Handle the exception here
+                    throw ex;
+                }
+            }
+
+        }
+        [HttpPost("top10players")]
+
+        public IActionResult Get_top10_player()
+        {
+            try
+            {
+
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from clt_top10_player( )";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+
+                List<PlayerToReturnListtopDTO> results = new List<PlayerToReturnListtopDTO>();
+
+
+                if (!UserReader.HasRows)
+                {
+
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<PlayerToReturnListtopDTO>(false, "User EMPTY", "500", results));
+                }
+
+
+                //else 
+                while (UserReader.Read())
+                {
+                    try
+                    {
+                        PlayerToReturnListtopDTO ServiceToReturnTopDTO = new PlayerToReturnListtopDTO();
+
+                        ServiceToReturnTopDTO.mobile = Convert.ToString(UserReader["mobile"]);
+                        ServiceToReturnTopDTO.firstname = Convert.ToString(UserReader["firstname"]);
+                        ServiceToReturnTopDTO.lastname = Convert.ToString(UserReader["lastname"]);
+                        ServiceToReturnTopDTO.num_sms = Convert.ToInt32(UserReader["num_sms"]);
+
+                        results.Add(ServiceToReturnTopDTO);
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                    }
+                }
+                npgsqlCommand.Dispose();
+                npgsqlConnection.Close();
+
+                return Ok(new DataResponse<PlayerToReturnListtopDTO>(false, "", "201", results));
+
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<PlayerToReturnListtopDTO>(true, "server error", "500", null));
+            }
+        }
+
+        [HttpPost("numberjoueurajr")]
+        public IActionResult Get_number_joueur_ajr()
+        {
+
+            {
+                try
+                {
+                    npgsqlConnection.Open();
+                    string requeteSQL = "SELECT clt_number_joueur_ajr()";
+                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                    int number_of_players_ajr = (int)npgsqlCommand.ExecuteScalar();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<int>(false, "", "201", number_of_players_ajr));
+                }
+                catch (Exception ex)
+                {
+                    npgsqlConnection.Close();
+                    // Handle the exception here
+                    throw ex;
                 }
             }
 

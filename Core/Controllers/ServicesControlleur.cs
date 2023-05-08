@@ -151,7 +151,151 @@ namespace Core.Controllers
                 return BadRequest(new DataResponse<ServiceToReturnDTO>(true, "server error", "500", null));
             }
         }
-      
+
+        [HttpPost("numberservice")]
+        public IActionResult Get_number_service()
+        {
+
+            {
+                try
+                {
+                    npgsqlConnection.Open();
+                    string requeteSQL = "SELECT clt_number_services()";
+                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                    int number_of_services = (int)npgsqlCommand.ExecuteScalar();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<int>(false, "", "201", number_of_services));
+                }
+                catch (Exception ex)
+                {
+                    npgsqlConnection.Close();
+                    // Handle the exception here
+                    throw ex;
+                }
+            }
+
+        }
+        [HttpPost("top10")]
+
+        public IActionResult Get_top10_service() { 
+         try
+            {
+
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from clt_top10_service( )";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+
+                 List<ServiceToReturnListtopDTO> results = new List<ServiceToReturnListtopDTO>();
+
+
+                   if (!UserReader.HasRows)
+                    {
+
+                      npgsqlCommand.Dispose();
+                      npgsqlConnection.Close();
+                      return Ok(new DataResponse<ServiceToReturnListtopDTO>(false, "User EMPTY", "500", results));
+                     }
+              
+
+                                    //else 
+                   while (UserReader.Read())
+                   {
+                      try
+                      {
+                        ServiceToReturnListtopDTO ServiceToReturnTopDTO = new ServiceToReturnListtopDTO();
+
+                      ServiceToReturnTopDTO.libelle = Convert.ToString(UserReader["libelle"]);
+                       ServiceToReturnTopDTO.number_gamers = Convert.ToInt32(UserReader["number_gamers"]);
+
+                      results.Add(ServiceToReturnTopDTO);
+
+
+
+                        }
+                      catch (Exception ex)
+                       {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                        }
+                    }
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+
+                    return Ok(new DataResponse<ServiceToReturnListDTO>(false, "", "201", results));
+
+         }
+                   catch (Exception ex)
+                    {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<ServiceToReturnListDTO>(true, "server error", "500", null));
+                    }
+        }
+        [HttpPost("joueurperservice")]
+
+        public IActionResult Get_joueur_service()
+        {
+            try
+            {
+
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from clt_number_gamers_perservice( )";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+
+                List<ServiceToReturnListJoueurDTO> results = new List<ServiceToReturnListJoueurDTO>();
+
+
+                if (!UserReader.HasRows)
+                {
+
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<ServiceToReturnListJoueurDTO>(false, "User EMPTY", "500", results));
+                }
+
+
+                //else 
+                while (UserReader.Read())
+                {
+                    try
+                    {
+                        ServiceToReturnListJoueurDTO ServiceToReturnjoueurDTO = new ServiceToReturnListJoueurDTO();
+
+                        ServiceToReturnjoueurDTO.libelle = Convert.ToString(UserReader["libelle"]);
+                        ServiceToReturnjoueurDTO.number_gamers = Convert.ToInt32(UserReader["number_gamers"]);
+
+                        results.Add(ServiceToReturnjoueurDTO);
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                    }
+                }
+                npgsqlCommand.Dispose();
+                npgsqlConnection.Close();
+
+                return Ok(new DataResponse<ServiceToReturnListJoueurDTO>(false, "", "201", results));
+
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<ServiceToReturnListJoueurDTO>(true, "server error", "500", null));
+            }
+        }
     }
 }
 

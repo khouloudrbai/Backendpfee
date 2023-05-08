@@ -43,9 +43,12 @@ namespace PFE.SMSNotification.Library.DTO.User
     {
         public int id_user { get; set; }
         public string mobile { get; set; }
+        public string firstname { get; set; }
+
         public string email { get; set; }
         public string address { get; set; }
-        public string pwd { get; set; }
+        public string picture { get; set; }
+
     }
     public class UserListToUpdateReturnDTO
     {
@@ -138,6 +141,15 @@ namespace PFE.SMSNotification.Library.DTO.User
         public string address { get; set; }
 
     }
+    public class UserToUpdatePwdDTO
+    {
+        public int id_user { get; set; }
+        public string old_pwd { get; set; }
+        public string new_pwd { get; set; }
 
-    
+    }
+
+
+
+
 }

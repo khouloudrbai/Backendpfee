@@ -32,6 +32,16 @@ namespace PFE.SMSNotification.Library.DTO.Services
         public string libelle { get; set; }
 
     }
-  
+  public class ServiceToReturnListtopDTO
+    {
+        public string libelle { get; set; }
+        public int number_gamers { get; set; }
+    }
+    public class ServiceToReturnListJoueurDTO
+    {
+        public string libelle { get; set; }
+        public int number_gamers { get; set; }
+
+    }
 
 }

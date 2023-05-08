@@ -63,5 +63,16 @@ namespace PFE.SMSNotification.Library.DTO.Players
 
 
     }
+  public class PlayerToReturnListtopDTO
+    {
+        public string mobile { get; set; }
+
+        public string firstname { get; set; }
+        public string lastname { get; set; }
+
+        public int num_sms { get; set; }
+
+    }
+   
 
 }
