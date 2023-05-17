@@ -7,6 +7,8 @@ namespace PFE.SMSNotification.Library.DTO.User
 {
     public class UserToAddDTO
     {
+        public int id_user { get; set; }
+
         public string lastname { get; set; }
         public string firstname { get; set; }
 
@@ -31,7 +33,7 @@ namespace PFE.SMSNotification.Library.DTO.User
         public string mobile { get; set; }
         public string email { get; set; }
         public string picture { get; set; }
-        public int statuts { get; set; }
+        public string statuts { get; set; }
         public string entry_date { get; set; }
 
 

@@ -30,7 +30,7 @@ namespace Core.Controllers
             try
             {
                 npgsqlConnection.Open();
-                string requeteSQL = @"select * from ctl_user_add(" + "'" + Useradd.lastname + "'," + "'" + Useradd.firstname + "'," + "'" + Useradd.mobile + "'," + "'" + Useradd.email + "'," + "'" +
+                string requeteSQL = @"select * from ctl_user_add(" +"'" + Useradd.id_user+ "'," + "'" + Useradd.lastname + "'," + "'" + Useradd.firstname + "'," + "'" + Useradd.mobile + "'," + "'" + Useradd.email + "'," + "'" +
                     Useradd.address + "','" + Useradd.pwd + "'," + "'" + Useradd.statuts + "'," + "'" + Useradd.entry_date + "'," + "'" + Useradd.picture + "')";
 
                 NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
@@ -60,7 +60,7 @@ namespace Core.Controllers
                         UserToReturnDTO.mobile = Convert.ToString(UserReader["mobile"]);
                         UserToReturnDTO.email = Convert.ToString(UserReader["email"]);
                         UserToReturnDTO.picture = Convert.ToString(UserReader["picture"]);
-                        UserToReturnDTO.statuts = Convert.ToInt32(UserReader["statuts"]);
+                        UserToReturnDTO.statuts = Convert.ToString(UserReader["statuts"]);
                         UserToReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
 
 
