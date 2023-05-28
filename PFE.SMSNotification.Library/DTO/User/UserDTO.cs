@@ -150,7 +150,11 @@ namespace PFE.SMSNotification.Library.DTO.User
         public string new_pwd { get; set; }
 
     }
-
+    public class VerifyDTO
+    {
+        public string email { get; set; }
+        public string pwd { get; set; }
+    }
 
 
 

@@ -23,11 +23,13 @@ namespace PFE.SMSNotification.Library.DTO.Services
     {
         public string mobile { get; set; }
         public string code { get; set; }
+        public int  id_user { get; set; }
+
     }
     public class ResetPassword
     {
         public string pwd { get; set; }
-        public string mobile { get; set; }
+        public string id_user { get; set; }
 
 
     }

@@ -27,7 +27,7 @@ namespace Core.Controllers
             npgsqlConnection = new NpgsqlConnection(Config.CONNECTION_STRING);
         }
         [HttpPost("addcode")]
-        public IActionResult get_service(AddCode codeget)
+        public IActionResult code_confirm_add(AddCode codeget)
         {
 
             try
@@ -84,7 +84,7 @@ namespace Core.Controllers
             {
                 npgsqlConnection.Close();
                 traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                return BadRequest(new DataResponse<CodeToReturn>(true, "server error", "500", null));
+                return BadRequest(new DataResponse<CodeToReturn>(true, " Mobile number does not exist in the users table", "500", null));
             }
         }
 
@@ -123,6 +123,8 @@ namespace Core.Controllers
 
                         ConfirmToReturnDTO.mobile = Convert.ToString(UserReader["mobile"]);
                         ConfirmToReturnDTO.code = Convert.ToString(UserReader["code"]);
+                        ConfirmToReturnDTO.id_user = Convert.ToInt32(UserReader["id_user"]);
+
 
 
 
@@ -156,7 +158,7 @@ namespace Core.Controllers
             try
             {
                 npgsqlConnection.Open();
-                string requeteSQL = @"select * from clt_reset_password( " + "'" + reset.pwd + "'," + "'" + reset.mobile + "')";
+                string requeteSQL = @"select * from clt_reset_password( " + "'" + reset.pwd + "'," + "'" + reset.id_user + "')";
 
                 NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 

@@ -8,11 +8,8 @@ namespace PFE.SMSNotification.Library.DTO.Players
 {
     public class PlayerToGetDTO
     {
-        public string id_player { get; set; }
-        public string keyword { get; set; }
-        public string id_service { get; set; }
-        public string libelle { get; set; }
-
+        public string service_libelle { get; set; }
+        public string type_service_libelle { get; set; }
         public string entry_date { get; set; }
         public string date_end { get; set; }
 
@@ -28,6 +25,8 @@ namespace PFE.SMSNotification.Library.DTO.Players
         public string address { get; set; }
         public string entry_date { get; set; }
         public string service { get; set; }
+        public string type { get; set; }
+
     }
     public class ListToGetDTO { }
     public class ListToGetListDTO

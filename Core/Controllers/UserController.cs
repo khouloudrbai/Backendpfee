@@ -471,5 +471,28 @@ namespace Core.Controllers
                 return BadRequest(new DataResponse<object>(true, "server error", "500", null));
             }
         }
+        [HttpPost("verify")]
+        public IActionResult verify_user(VerifyDTO verify)
+        {
+
+            {
+                try
+                {
+                    npgsqlConnection.Open();
+                    string requeteSQL = "SELECT ctl_verify_user(" + "'" + verify.email+ "','"+ verify.pwd + "')";
+                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                    int number = (int)npgsqlCommand.ExecuteScalar();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<int>(false, "", "201", number));
+                }
+                catch (Exception ex)
+                {
+                    npgsqlConnection.Close();
+                    // Handle the exception here
+                    throw ex;
+                }
+            }
+
+        }
     }
     }

@@ -61,10 +61,13 @@ namespace Core.Controllers
                         ServiceToReturnListDTO ServiceToReturnDTO = new ServiceToReturnListDTO();
 
                         ServiceToReturnDTO.id_service = Convert.ToInt32(UserReader["id_service"]);
-                        ServiceToReturnDTO.shortcode = Convert.ToString(UserReader["shortcode"]);
                         ServiceToReturnDTO.libelle = Convert.ToString(UserReader["libelle"]);
-                        ServiceToReturnDTO.number_gamers = Convert.ToInt32(UserReader["number_gamers"]);
+                        ServiceToReturnDTO.type_service = Convert.ToString(UserReader["type_service"]);
                         ServiceToReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
+                        ServiceToReturnDTO.date_end = Convert.ToString(UserReader["date_end"]);
+
+
+
 
 
                         results.Add(ServiceToReturnDTO);
@@ -126,10 +129,12 @@ namespace Core.Controllers
 
                         ServiceToReturnserviceDTO.id_service = Convert.ToInt32(UserReader["id_service"]);
                         ServiceToReturnserviceDTO.shortcode = Convert.ToString(UserReader["shortcode"]);
-                        ServiceToReturnserviceDTO.number_gamers = Convert.ToInt32(UserReader["number_gamers"]);
                         ServiceToReturnserviceDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
+                        ServiceToReturnserviceDTO.date_end = Convert.ToString(UserReader["date_end"]);
 
+                        ServiceToReturnserviceDTO.type_service = Convert.ToString(UserReader["type_service"]);
                         ServiceToReturnserviceDTO.libelle = Convert.ToString(UserReader["libelle"]);
+
 
                         results.Add(ServiceToReturnserviceDTO);
 
@@ -242,28 +247,78 @@ namespace Core.Controllers
                         return BadRequest(new DataResponse<ServiceToReturnListDTO>(true, "server error", "500", null));
                     }
         }
+
         [HttpPost("joueurperservice")]
-        public IActionResult Get_joueur_service()
+        public IActionResult Get_joueur_service(ServiceToGetNumberDTO servicenumberget)
         {
             try
             {
 
                 npgsqlConnection.Open();
-                string requeteSQL = @"select * from clt_number_gamers_perservice( )";
+                string requeteSQL = @"select * from clt_number_gamers_perservice(" + "'" + servicenumberget.id_service + "')";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                int number_of_players = (int)npgsqlCommand.ExecuteScalar();
+                npgsqlConnection.Close();
+                return Ok(new DataResponse<int>(false, "", "201", number_of_players));
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                // Handle the exception here
+                throw ex;
+            }
+
+        }
+
+        [HttpPost("joueurperperiode")]
+        public IActionResult Get_joueur_date(ServiceToGetPlayersDateDTO servicenumberdateget)
+        {
+            try
+            {
+
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from clt_number_gamers_perdate(" + "'" + servicenumberdateget.date_begin + "'," + "'" + servicenumberdateget.date_end + "')";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                int number_of_players_perdate = (int)npgsqlCommand.ExecuteScalar();
+                npgsqlConnection.Close();
+                return Ok(new DataResponse<int>(false, "", "201", number_of_players_perdate));
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                // Handle the exception here
+                throw ex;
+            }
+
+        }
+
+
+        [HttpPost("gettype")]
+        public IActionResult get_type(ServiceToGetTypeDTO typeget)
+        {
+
+            try
+            {
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from get_type( )";
 
                 NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
 
+                //read requete
                 NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+                //n7otouha fi list 
+                List<ServiceToReturnTypeListDTO> results = new List<ServiceToReturnTypeListDTO>();
 
-                List<ServiceToReturnListJoueurDTO> results = new List<ServiceToReturnListJoueurDTO>();
-
+                //si user doesnt have a row then
 
                 if (!UserReader.HasRows)
                 {
 
                     npgsqlCommand.Dispose();
                     npgsqlConnection.Close();
-                    return Ok(new DataResponse<ServiceToReturnListJoueurDTO>(false, "User EMPTY", "500", results));
+                    return Ok(new DataResponse<ServiceToReturnTypeListDTO>(false, "User EMPTY", "500", results));
                 }
 
 
@@ -272,12 +327,14 @@ namespace Core.Controllers
                 {
                     try
                     {
-                        ServiceToReturnListJoueurDTO ServiceToReturnjoueurDTO = new ServiceToReturnListJoueurDTO();
+                        ServiceToReturnTypeListDTO ServiceToReturnTypeDTO = new ServiceToReturnTypeListDTO();
 
-                        ServiceToReturnjoueurDTO.libelle = Convert.ToString(UserReader["libelle"]);
-                        ServiceToReturnjoueurDTO.number_gamers = Convert.ToInt32(UserReader["number_gamers"]);
+                        ServiceToReturnTypeDTO.id_type_service = Convert.ToInt32(UserReader["id_type_service"]);
+                        ServiceToReturnTypeDTO.libelle_type_service = Convert.ToString(UserReader["libelle_type_service"]);
+                       
 
-                        results.Add(ServiceToReturnjoueurDTO);
+
+                        results.Add(ServiceToReturnTypeDTO);
 
 
 
@@ -292,83 +349,25 @@ namespace Core.Controllers
                 npgsqlCommand.Dispose();
                 npgsqlConnection.Close();
 
-                return Ok(new DataResponse<ServiceToReturnListJoueurDTO>(false, "", "201", results));
+                return Ok(new DataResponse<ServiceToReturnTypeListDTO>(false, "", "201", results));
 
             }
             catch (Exception ex)
             {
                 npgsqlConnection.Close();
                 traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                return BadRequest(new DataResponse<ServiceToReturnListJoueurDTO>(true, "server error", "500", null));
+                return BadRequest(new DataResponse<ServiceToReturnTypeListDTO>(true, "server error", "500", null));
             }
         }
-    
-    [HttpPost("getservicestat")]
-    public IActionResult get_service_stat( )
-    {
-
-        try
-        {
-            npgsqlConnection.Open();
-            string requeteSQL = @"select * from get_service_statistics( )";
-
-            NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
-
-            //read requete
-            NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
-            //n7otouha fi list 
-            List<ServiceToReturnStatDTO> results = new List<ServiceToReturnStatDTO>();
-
-            //si user doesnt have a row then
-
-            if (!UserReader.HasRows)
-            {
-
-                npgsqlCommand.Dispose();
-                npgsqlConnection.Close();
-                return Ok(new DataResponse<ServiceToReturnStatDTO>(false, "User EMPTY", "500", results));
-            }
-
-
-            //else 
-            while (UserReader.Read())
-            {
-                try
-                {
-                        ServiceToReturnStatDTO ServiceToReturnStatDTO = new ServiceToReturnStatDTO();
-
-                        ServiceToReturnStatDTO.id_service = Convert.ToInt32(UserReader["id_service"]);
-                        ServiceToReturnStatDTO.libelle = Convert.ToString(UserReader["libelle"]);
-                        ServiceToReturnStatDTO.number_gamers = Convert.ToInt32(UserReader["number_gamers"]);
-
-
-                    results.Add(ServiceToReturnStatDTO);
 
 
 
-                }
-                catch (Exception ex)
-                {
-                    npgsqlConnection.Close();
-                    traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                    return BadRequest(new DataResponse<object>(true, "server error", "500", null));
-                }
-            }
-            npgsqlCommand.Dispose();
-            npgsqlConnection.Close();
 
-            return Ok(new DataResponse<ServiceToReturnStatDTO>(false, "", "201", results));
 
-        }
-        catch (Exception ex)
-        {
-            npgsqlConnection.Close();
-            traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-            return BadRequest(new DataResponse<ServiceToReturnStatDTO>(true, "server error", "500", null));
-        }
+
     }
-    
-    }
+
+   
 
 }
 

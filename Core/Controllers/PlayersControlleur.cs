@@ -32,9 +32,7 @@ namespace Core.Controllers
             try
             {
                 npgsqlConnection.Open();
-                string requeteSQL = @"select * from ctl_players_detail('" + playerget.id_player + "','" + playerget.keyword + "','"
-                    + playerget.id_service + "','" +
-                    playerget.libelle + "','"
+                string requeteSQL = @"select * from ctl_players_detail('" + playerget.service_libelle + "','" + playerget.type_service_libelle + "','"
                     + playerget.entry_date + "','" +
                     playerget.date_end + "')";
 
@@ -70,6 +68,8 @@ namespace Core.Controllers
                         PlayerToReturnDTO.address = Convert.ToString(UserReader["address"]);
                         PlayerToReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
                         PlayerToReturnDTO.service = Convert.ToString(UserReader["service"]);
+                        PlayerToReturnDTO.type = Convert.ToString(UserReader["type"]);
+
                         results.Add(PlayerToReturnDTO);
 
 

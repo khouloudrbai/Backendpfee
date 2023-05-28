@@ -13,11 +13,10 @@ namespace PFE.SMSNotification.Library.DTO.Services
 
     {
         public int id_service { get; set; }
-        public string shortcode { get; set; }
+        public string type_service { get; set; }
         public string libelle { get; set; }
         public string entry_date { get; set; }
-        public int number_gamers { get; set; }
-
+        public string date_end { get; set; }
 
     }
     public class ServiceToGetDTO
@@ -32,9 +31,15 @@ namespace PFE.SMSNotification.Library.DTO.Services
     {
         public int id_service { get; set; }
         public string shortcode { get; set; }
-        public int number_gamers { get; set; }
         public string libelle { get; set; }
         public string entry_date { get; set; }
+        public string date_end { get; set; }
+
+        public string type_service{ get; set; }
+
+
+        
+
 
     }
   public class ServiceToReturnListtopDTO
@@ -56,5 +61,29 @@ namespace PFE.SMSNotification.Library.DTO.Services
         public string libelle { get; set; }
         public int number_gamers { get; set; }
     }
+
+    public class ServiceToGetTypeDTO
+    {
+        
+    }
+    public class ServiceToReturnTypeListDTO
+    {
+       public int id_type_service { get; set; }
+        public string libelle_type_service { get; set; }
+
+    }
+
+    public class ServiceToGetNumberDTO
+    {
+        public int id_service { get; set; }
+    }
+
+
+    public class ServiceToGetPlayersDateDTO
+    {
+        public string date_begin { get; set; }
+        public string date_end { get; set; }
+    }
+
 
 }
