@@ -39,6 +39,7 @@ namespace PFE.SMSNotification.Library.DTO.Players
         public string address { get; set; }
         public string entry_date { get; set; }
         public string service { get; set; }
+        public string type { get; set; }
     }
     public class JoueurToGetDTO
     {
@@ -72,6 +73,16 @@ namespace PFE.SMSNotification.Library.DTO.Players
         public int num_sms { get; set; }
 
     }
-   
+    public class ServiceToGetPlayersDateDTO
+    {
+        public string date_begin { get; set; }
+        public string date_end { get; set; }
+    }
+
+    public class JoueurPerPeriodDTO
+    {
+        public int nbr_joueur { get; set; }
+        public DateTime entry_date { get; set; }
+    }
 
 }

@@ -7,6 +7,11 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Numerics;
 
 namespace Core.Controllers
 {
@@ -159,72 +164,85 @@ namespace Core.Controllers
         [HttpPost("authentification")]
         public IActionResult Contact_auth(UserToauthDTO Userauth)
         {
-
+            try
             {
-                try
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from ctl_user_authenticate('" + Userauth.email + "','" + Userauth.pwd + "')";
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+
+                // Execute the query
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+
+                // Check if the user exists
+                if (!UserReader.HasRows)
                 {
-
-                    npgsqlConnection.Open();
-                    string requeteSQL = @"select * from ctl_user_authenticate(" + "'" + Userauth.email + "','"
-                                                                              + Userauth.pwd
-                                                                              + "')";
-
-                    NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
-
-                    //read requete
-                    NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
-                    //n7otouha fi list 
-                    UserListToAuthReturnDTO UserToAuthReturnDTO = new UserListToAuthReturnDTO();
-                    //si user doesnt have a row then
-
-                    if (!UserReader.HasRows)
-                    {
-
-                        npgsqlCommand.Dispose();
-                        npgsqlConnection.Close();
-                        return Ok(new DataResponse<UserListToAuthReturnDTO>(false, "User EMPTY", "500", UserToAuthReturnDTO));
-                    }
-                    //else 
-                    while (UserReader.Read())
-                    {
-                        try
-                        {
-
-                            UserToAuthReturnDTO.id_user = Convert.ToInt32(UserReader["id_user"]);
-                            UserToAuthReturnDTO.firstname = Convert.ToString(UserReader["firstname"]);
-                            UserToAuthReturnDTO.lastname = Convert.ToString(UserReader["lastname"]);
-                            UserToAuthReturnDTO.mobile = Convert.ToString(UserReader["mobile"]);
-                            UserToAuthReturnDTO.mail = Convert.ToString(UserReader["mail"]);
-                            UserToAuthReturnDTO.address = Convert.ToString(UserReader["address"]);
-                            UserToAuthReturnDTO.pwd = Convert.ToString(UserReader["pwd"]);
-                            UserToAuthReturnDTO.picture = Convert.ToString(UserReader["picture"]);
-
-
-
-                        }
-                        catch (Exception ex)
-                        {
-                            npgsqlConnection.Close();
-                            traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                            return BadRequest(new DataResponse<object>(true, "server error", "500", null));
-                        }
-                    }
                     npgsqlCommand.Dispose();
                     npgsqlConnection.Close();
-
-                    return Ok(new DataResponse<UserListToAuthReturnDTO>(false, "", "201", UserToAuthReturnDTO));
-
+                    return Ok(new DataResponse<object>(false, "User EMPTY", "500", null));
                 }
-                catch (Exception ex)
+
+                UserListToAuthReturnDTO UserToAuthReturnDTO = new UserListToAuthReturnDTO();
+
+                // Read the user information
+                while (UserReader.Read())
                 {
-                    npgsqlConnection.Close();
-                    traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
-                    return BadRequest(new DataResponse<UserListToAuthReturnDTO>(true, "server error", "500", null));
+                    UserToAuthReturnDTO.id_user = Convert.ToInt32(UserReader["id_user"]);
+                    UserToAuthReturnDTO.firstname = Convert.ToString(UserReader["firstname"]);
+                    UserToAuthReturnDTO.lastname = Convert.ToString(UserReader["lastname"]);
+                    UserToAuthReturnDTO.mobile = Convert.ToString(UserReader["mobile"]);
+                    UserToAuthReturnDTO.mail = Convert.ToString(UserReader["mail"]);
+                    UserToAuthReturnDTO.address = Convert.ToString(UserReader["address"]);
+                    UserToAuthReturnDTO.pwd = Convert.ToString(UserReader["pwd"]);
+                    UserToAuthReturnDTO.picture = Convert.ToString(UserReader["picture"]);
                 }
+
+                // Generate JWT token
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("KHOULOUDNOUHAPFEkhouloudnouhapfe20222023"));
+
+                
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+
+
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim("id_user", UserToAuthReturnDTO.id_user.ToString()),
+                        new Claim("firstname", UserToAuthReturnDTO.firstname),
+                        new Claim("lastname", UserToAuthReturnDTO.lastname),
+                        new Claim("mobile", UserToAuthReturnDTO.mobile),
+                        new Claim("mail", UserToAuthReturnDTO.mail),
+                        new Claim("address", UserToAuthReturnDTO.address),
+                        new Claim("pwd", UserToAuthReturnDTO.pwd),
+                        new Claim("picture", UserToAuthReturnDTO.picture),
+
+                    }),
+
+
+                    Expires = DateTime.UtcNow.AddDays(7), // Set token expiration
+                    SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+                };
+
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var jwtToken = tokenHandler.WriteToken(token);
+
+
+
+                npgsqlCommand.Dispose();
+                npgsqlConnection.Close();
+
+                return Ok(new DataResponse<object>(false, "", "201", new { token = jwtToken }));
             }
-
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+            }
         }
-
         [HttpPost("list")]
         public IActionResult Get_user(UserToGetDTO Userget)
         {
@@ -267,6 +285,7 @@ namespace Core.Controllers
                             UserTogetReturnDTO.mail = Convert.ToString(UserReader["mail"]);
                             UserTogetReturnDTO.address = Convert.ToString(UserReader["address"]);
                             UserTogetReturnDTO.picture = Convert.ToString(UserReader["picture"]);
+                            UserTogetReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
 
                             results.Add(UserTogetReturnDTO);
 
@@ -407,6 +426,7 @@ namespace Core.Controllers
                             UserTogetReturnDTO.mail = Convert.ToString(UserReader["mail"]);
                             UserTogetReturnDTO.address = Convert.ToString(UserReader["address"]);
                             UserTogetReturnDTO.picture = Convert.ToString(UserReader["picture"]);
+                            UserTogetReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
 
                             results.Add(UserTogetReturnDTO);
 

@@ -10,10 +10,23 @@ namespace PFE.SMSNotification.Library.DTO.ApiSendSMS
 
         public string mobile { get; set; }
         public string sender { get; set; }
-        public string date { get; set; }
         public string sms { get; set; }
+        public string date { get; set; }
 
-        public string time { get; set; }
+
+
+
+    }
+    public class SMSToScheduleDTO
+    {
+
+        public string mobile { get; set; }
+        public string sender { get; set; }
+        public string sms { get; set; }
+        public DateTime myDate { get; set; }
+
+
+
 
 
     }
@@ -70,6 +83,13 @@ namespace PFE.SMSNotification.Library.DTO.ApiSendSMS
         public string date_end { get; set; }
     }
 
+
+    public class SmsToReturnListPeriodDTO
+    {
+        public int nbr_sms { get; set; }
+        public DateTime entry_date { get; set; }
+    }
+ 
 
 
 }

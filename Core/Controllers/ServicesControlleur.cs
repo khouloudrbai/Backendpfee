@@ -249,50 +249,68 @@ namespace Core.Controllers
         }
 
         [HttpPost("joueurperservice")]
-        public IActionResult Get_joueur_service(ServiceToGetNumberDTO servicenumberget)
+        public IActionResult Get_joueur_service( )
         {
             try
             {
 
                 npgsqlConnection.Open();
-                string requeteSQL = @"select * from clt_number_gamers_perservice(" + "'" + servicenumberget.id_service + "')";
+                string requeteSQL = @"select * from clt_number_gamers_perservice( )";
 
                 NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
-                int number_of_players = (int)npgsqlCommand.ExecuteScalar();
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+                //n7otouha fi list 
+                List<ServiceToReturnNBListDTO> results = new List<ServiceToReturnNBListDTO>();
+
+                //si user doesnt have a row then
+
+                if (!UserReader.HasRows)
+                {
+
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<ServiceToReturnNBListDTO>(false, "User EMPTY", "500", results));
+                }
+
+
+                //else 
+                while (UserReader.Read())
+                {
+                    try
+                    {
+                        ServiceToReturnNBListDTO ServiceToReturnNBDTO = new ServiceToReturnNBListDTO();
+
+                        ServiceToReturnNBDTO.libelle = Convert.ToString(UserReader["libelle"]);
+                        ServiceToReturnNBDTO.v_number = Convert.ToInt32(UserReader["v_number"]);
+
+
+
+                        results.Add(ServiceToReturnNBDTO);
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                    }
+                }
+                npgsqlCommand.Dispose();
                 npgsqlConnection.Close();
-                return Ok(new DataResponse<int>(false, "", "201", number_of_players));
+
+                return Ok(new DataResponse<ServiceToReturnNBListDTO>(false, "", "201", results));
+
             }
             catch (Exception ex)
             {
                 npgsqlConnection.Close();
-                // Handle the exception here
-                throw ex;
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<ServiceToReturnNBListDTO>(true, "server error", "500", null));
             }
-
         }
 
-        [HttpPost("joueurperperiode")]
-        public IActionResult Get_joueur_date(ServiceToGetPlayersDateDTO servicenumberdateget)
-        {
-            try
-            {
-
-                npgsqlConnection.Open();
-                string requeteSQL = @"select * from clt_number_gamers_perdate(" + "'" + servicenumberdateget.date_begin + "'," + "'" + servicenumberdateget.date_end + "')";
-
-                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
-                int number_of_players_perdate = (int)npgsqlCommand.ExecuteScalar();
-                npgsqlConnection.Close();
-                return Ok(new DataResponse<int>(false, "", "201", number_of_players_perdate));
-            }
-            catch (Exception ex)
-            {
-                npgsqlConnection.Close();
-                // Handle the exception here
-                throw ex;
-            }
-
-        }
 
 
         [HttpPost("gettype")]
@@ -361,13 +379,75 @@ namespace Core.Controllers
         }
 
 
+        [HttpPost("getserviceid")]
+        public IActionResult get_service_id()
+        {
+
+            try
+            {
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from get_id_service( )";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+
+                //read requete
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+                //n7otouha fi list 
+                List<ServiceToReturnIdListDTO> results = new List<ServiceToReturnIdListDTO>();
+
+                //si user doesnt have a row then
+
+                if (!UserReader.HasRows)
+                {
+
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<ServiceToReturnIdListDTO>(false, "User EMPTY", "500", results));
+                }
+
+
+                //else 
+                while (UserReader.Read())
+                {
+                    try
+                    {
+                        ServiceToReturnIdListDTO ServiceToReturnTypeDTO = new ServiceToReturnIdListDTO();
+
+                        ServiceToReturnTypeDTO.id_service = Convert.ToInt32(UserReader["id_service"]);
+
+                        results.Add(ServiceToReturnTypeDTO);
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                    }
+                }
+                npgsqlCommand.Dispose();
+                npgsqlConnection.Close();
+
+                return Ok(new DataResponse<ServiceToReturnIdListDTO>(false, "", "201", results));
+
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<ServiceToReturnIdListDTO>(true, "server error", "500", null));
+            }
+        }
+
 
 
 
 
     }
 
-   
+
 
 }
 

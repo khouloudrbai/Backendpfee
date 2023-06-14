@@ -3,11 +3,8 @@ using PFE.SMSNotification.Library.DTO.Services;
 using PFE.SMSNotification.Library.Utility;
 using PFE.SMSNotification.Utility;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using Npgsql;
 using System;
-using System.Collections.Generic;
-
 
 
 namespace Core.Controllers
@@ -61,18 +58,24 @@ namespace Core.Controllers
 
                         AddToReturnDTO.mobile = Convert.ToString(UserReader["mobile"]);
                         AddToReturnDTO.code = Convert.ToString(UserReader["code"]);
-                       
-                        
-
 
 
                     }
+                     
+
                     catch (Exception ex)
                     {
                         npgsqlConnection.Close();
                         traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
                         return BadRequest(new DataResponse<object>(true, "server error", "500", null));
                     }
+                    var apiSendCodeController = new ApiSendCodeController();
+                    var smsToSend = new CodeToReturn
+                    {
+                        mobile = AddToReturnDTO.mobile,
+                        code = AddToReturnDTO.code
+                    };
+                    apiSendCodeController.sendsms(smsToSend);
                 }
                 npgsqlCommand.Dispose();
                 npgsqlConnection.Close();
@@ -120,10 +123,9 @@ namespace Core.Controllers
                 {
                     try
                     {
-
+                        ConfirmToReturnDTO.id_user = Convert.ToInt32(UserReader["id_user"]);
                         ConfirmToReturnDTO.mobile = Convert.ToString(UserReader["mobile"]);
                         ConfirmToReturnDTO.code = Convert.ToString(UserReader["code"]);
-                        ConfirmToReturnDTO.id_user = Convert.ToInt32(UserReader["id_user"]);
 
 
 

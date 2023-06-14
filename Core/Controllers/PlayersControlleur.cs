@@ -135,6 +135,8 @@ namespace Core.Controllers
                         PlayerToReturnDTO.address = Convert.ToString(UserReader["address"]);
                         PlayerToReturnDTO.entry_date = Convert.ToString(UserReader["entry_date"]);
                         PlayerToReturnDTO.service = Convert.ToString(UserReader["service"]);
+                        PlayerToReturnDTO.type = Convert.ToString(UserReader["type"]);
+
                         results.Add(PlayerToReturnDTO);
 
 
@@ -343,5 +345,67 @@ namespace Core.Controllers
 
         }
 
+        [HttpPost("joueurperperiode")]
+        public IActionResult Get_joueur_date(ServiceToGetPlayersDateDTO servicenumberdateget)
+        {
+            try
+            {
+
+                npgsqlConnection.Open();
+                string requeteSQL = @"select * from clt_number_gamers_perdate(" + "'" + servicenumberdateget.date_begin + "'," + "'" + servicenumberdateget.date_end + "')";
+
+                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(requeteSQL, npgsqlConnection);
+                NpgsqlDataReader UserReader = npgsqlCommand.ExecuteReader();
+                //n7otouha fi list 
+                List<JoueurPerPeriodDTO> results = new List<JoueurPerPeriodDTO>();
+
+                //si user doesnt have a row then
+
+                if (!UserReader.HasRows)
+                {
+
+                    npgsqlCommand.Dispose();
+                    npgsqlConnection.Close();
+                    return Ok(new DataResponse<JoueurPerPeriodDTO>(false, "User EMPTY", "500", results));
+                }
+
+
+                //else 
+                while (UserReader.Read())
+                {
+                    try
+                    {
+                        JoueurPerPeriodDTO JoueurToReturndateDTO = new JoueurPerPeriodDTO();
+
+                        JoueurToReturndateDTO.nbr_joueur = Convert.ToInt32(UserReader["nbr_joueur"]);
+                        JoueurToReturndateDTO.entry_date = Convert.ToDateTime(UserReader["entry_date"]);
+
+                        results.Add(JoueurToReturndateDTO);
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        npgsqlConnection.Close();
+                        traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                        return BadRequest(new DataResponse<object>(true, "server error", "500", null));
+                    }
+                }
+                npgsqlCommand.Dispose();
+                npgsqlConnection.Close();
+
+                return Ok(new DataResponse<JoueurPerPeriodDTO>(false, "", "201", results));
+
+            }
+            catch (Exception ex)
+            {
+                npgsqlConnection.Close();
+                traceManager.WriteLog(ex, System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return BadRequest(new DataResponse<JoueurPerPeriodDTO>(true, "server error", "500", null));
+            }
+        }
+
     }
+
 }

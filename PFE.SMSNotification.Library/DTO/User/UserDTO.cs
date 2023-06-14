@@ -101,6 +101,7 @@ namespace PFE.SMSNotification.Library.DTO.User
         public string address { get; set; }
 
         public string picture { get; set; }
+        public string entry_date { get; set; }
     }
     public class UserTodeleteDTO
     {
@@ -141,6 +142,7 @@ namespace PFE.SMSNotification.Library.DTO.User
         public string picture { get; set; }
         public int statuts { get; set; }
         public string address { get; set; }
+        public string entry_date { get; set; }
 
     }
     public class UserToUpdatePwdDTO

@@ -1,5 +1,6 @@
 
 
+using Dapper;
 using System;
 using System.Numerics;
 
@@ -23,7 +24,7 @@ namespace PFE.SMSNotification.Library.DTO.Services
     {
         public string mobile { get; set; }
         public string code { get; set; }
-        public int  id_user { get; set; }
+        public int id_user { get; set; }
 
     }
     public class ResetPassword
